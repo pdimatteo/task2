@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Scanner;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
@@ -13,7 +14,9 @@ import com.pdm.task2.ConnectionManager;
 
 public class MainController {
 
-public static void main(String[] args) {
+private static int sleepTime = 1000; 
+	
+public static void main(String[] args) throws InterruptedException {
 		
 	String remoteFile = "/home/star3/tasks/task1/data.txt";
 
@@ -29,25 +32,33 @@ public static void main(String[] args) {
 	} catch (JSchException e) {
 		System.out.println("An error occours while trying to connect");
 	}
-		
-	if(session != null) {
-		try {
-			sftpChannel = (ChannelSftp) session.openChannel("sftp");
-			sftpChannel.connect();
+
+	Scanner reader = new Scanner(System.in); 
+	System.out.println("Enter sleep time (ms): ");
+	sleepTime = reader.nextInt();
+	
+	while(true) {
+		if(session != null) {
+			try {
+				sftpChannel = (ChannelSftp) session.openChannel("sftp");
+				sftpChannel.connect();
 				
-			InputStream out = null;
-		    out = sftpChannel.get(remoteFile);
-		    BufferedReader br = new BufferedReader(new InputStreamReader(out));
+				InputStream out = null;
+				out = sftpChannel.get(remoteFile);
+				BufferedReader br = new BufferedReader(new InputStreamReader(out));
 		        
-		    String line;
-		    while ((line = br.readLine()) != null)
-		    	System.out.println(line);
-		        br.close();
-			} catch (JSchException | SftpException e) {
-				System.out.println("An error occours while trying to create sftp channel");
-			} catch (IOException e) {
-				System.out.println("IO exception");	
-			}
+				String line;
+				while ((line = br.readLine()) != null)
+					System.out.println(line);
+		        	br.close();
+				} catch (JSchException | SftpException e) {
+					System.out.println("An error occours while trying to create sftp channel");
+				} catch (IOException e) {
+					System.out.println("IO exception");	
+				}
+			}	
+			Thread.sleep(sleepTime);
 		}
 	}
+
 }
